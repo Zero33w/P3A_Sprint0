@@ -13,8 +13,13 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +47,16 @@ public class MainActivity extends AppCompatActivity {
         btnAgregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ejecutarServicio("http://192.168.1.153:80/sprint0/insertar_medida.php");
+                ejecutarServicio("http://10.236.27.138:80/sprint0/insertar_medida.php");
+                //ejecutarServicio("http://192.168.1.153:80/sprint0/insertar_medida.php");
+            }
+        });
+
+        btnBuscar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buscarMedida("http://10.236.27.138:80/sprint0/buscar_medida.php?idMedicion="+edtIdMedicion.getText()+"");
+               // buscarMedida("http://192.168.1.153:80/sprint0/buscar_medida.php?idMedicion="+edtIdMedicion.getText()+"");
             }
         });
     }
@@ -71,5 +85,32 @@ public class MainActivity extends AppCompatActivity {
         };
         requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
+    }
+
+    //La siguiente funcion realiza la consulta para solicitar la medida de la tabla medida en la base de datos indicada a traves de la isMedicion que le pasas
+    private void buscarMedida(String URL){
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(URL, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                JSONObject jsonObject = null;
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        jsonObject = response.getJSONObject(i);
+                        edtIdSensor.setText(jsonObject.getString("idSensor"));
+                        edtValorMedicion.setText(jsonObject.getString("valorMedicion"));
+                    } catch (JSONException e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),"ERROR DE CONEXIÓN", Toast.LENGTH_SHORT).show();
+            }
+        }
+        );
+        requestQueue=Volley.newRequestQueue(this);
+        requestQueue.add(jsonArrayRequest);
     }
 }
