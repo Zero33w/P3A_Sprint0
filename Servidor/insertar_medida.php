@@ -3,15 +3,15 @@
 include 'conexion.php';//incluimos el archivo conexion
 
 //creamos las variables que guardarán los datos enviados desde la aplicación android
-$idMedicion=$_POST['idMedicion'];
+$idMedicion=$_POST[null];
 $idSensor=$_POST['idSensor'];
 $valorMedicion=$_POST['valorMedicion'];
 //$latitud=$_POST['latitud'];
 //$longitud=$_POST['longitud'];
-//$momentoMedicion=$_POST['momentoMedicion'];
+$momentoMedicion=$_POST['momentoMedicion'];
 
 //hacemos la consulta para insertar en la base de datos los datos recibidos
-$consulta="insert into medida values('".$idMedicion."','".$idSensor."','".$valorMedicion."')";
+$consulta="insert into medida values('".$idMedicion."','".$idSensor."','".$valorMedicion."','".$momentoMedicion."')";
 mysqli_query($conexion,$consulta) or die (mysqli_error());
 mysqli_close($conexion);//cerramos sesión
 
