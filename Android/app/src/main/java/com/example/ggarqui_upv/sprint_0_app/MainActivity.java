@@ -21,7 +21,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         btnAgregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ejecutarServicio("http://192.168.1.141:80/sprint0/insertar_medida.php");
+                GuardararMedidaEnBD("http://192.168.1.141:80/sprint0/insertar_medida.php");
                 //ejecutarServicio("http://192.168.1.153:80/sprint0/insertar_medida.php");
             }
         });
@@ -61,16 +60,17 @@ public class MainActivity extends AppCompatActivity {
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                buscarMedida("http://192.168.1.141:80/sprint0/buscar_medida.php?idMedicion="+edtIdMedicion.getText()+"");
+                BuscarMedidaPorID("http://192.168.1.141:80/sprint0/buscar_medida.php?idMedicion="+edtIdMedicion.getText()+"");
                // buscarMedida("http://192.168.1.153:80/sprint0/buscar_medida.php?idMedicion="+edtIdMedicion.getText()+"");
             }
         });
     }
 
     //La siguiente funcion realiza la consulta para subir los datos en los distintos campos del layout como una nueva entrada en la base de datos
-    protected void ejecutarServicio(String enlace){
+    //String -> EjecutarServicio()
+    protected void GuardararMedidaEnBD(String URL){
 
-        StringRequest stringRequest=new StringRequest(Request.Method.POST, enlace, new Response.Listener<String>() {
+        StringRequest stringRequest=new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Toast.makeText(getApplicationContext(),"OPERACION EXITOSA",Toast.LENGTH_SHORT).show();
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 parametros.put("idMedicion",edtIdMedicion.getText().toString());
                 parametros.put("idSensor",edtIdSensor.getText().toString());
                 parametros.put("valorMedicion",edtValorMedicion.getText().toString());
-                parametros.put("momentoMedicion",momentoActual());
+                parametros.put("momentoMedicion", ObtenerFechaYHoraActual());
                 return parametros;
             }
         };
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //La siguiente funcion realiza la consulta para solicitar la medida de la tabla medida en la base de datos indicada a traves de la isMedicion que le pasas
-    private void buscarMedida(String URL){
+    private void BuscarMedidaPorID(String URL){
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -123,12 +123,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //La siguiente funcion sirve para capturar la fecha y hora en formato timestamp del momento en que es llamada
-    public String momentoActual(){
+    public String ObtenerFechaYHoraActual(){
         TimeZone tz = TimeZone.getTimeZone("GMT+2");
         Calendar calendar= Calendar.getInstance(tz);
         SimpleDateFormat simpleDateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         simpleDateFormat.setTimeZone(tz);
-        String momento=simpleDateFormat.format(calendar.getTime());
-        return momento;
+        String timestamp=simpleDateFormat.format(calendar.getTime());
+        return timestamp;
     }
 }
